@@ -10,66 +10,56 @@ namespace StringCalculatorKata
         private const String CustomDelimiterSuffix = "\n";
         private const Char CustomLengthDelimiterPrefix = '[';
         private const Char CustomLengthDelimiterSuffix = ']';
+        private const Int32 minNumber = 0;
+        private const Int32 maxNumber = 1000;
 
         public Int32 Add(String input)
         {
-            var firstNumber = 0;
-            var sum = 0;
+            if (String.IsNullOrWhiteSpace(input))
+                return 0;
 
-            if (!String.IsNullOrWhiteSpace(input))
-            {
-                if(!(input.Contains(",") || input.Contains("\n")))
-                {
-                    firstNumber = Convert.ToInt32(input);
-                }
-                else
-                {
-                    String customDelimiter = null;
-                    var numberList = new List<Int32>();
-                    var customDelimiterIsDefined = input.Substring(0, 2) == CustomDelimiterPrefix;
+            var noDelimitersAreUsed = !(input.Contains(",") || input.Contains("\n"));
+            if (noDelimitersAreUsed)
+                return Convert.ToInt32(input);
 
-                    if (customDelimiterIsDefined)
-                    {
+            var numberList = new List<Int32>();
+            var customDelimiterIsDefined = input.Substring(0, 2) == CustomDelimiterPrefix;
 
-                        var isolatingDelimiters = new[] { CustomDelimiterPrefix, CustomDelimiterSuffix };
-                        var expressionParts = input.Split(isolatingDelimiters, StringSplitOptions.RemoveEmptyEntries);
-                        customDelimiter = expressionParts[0];
-                        var customLengthDelimiterIsDefined = customDelimiter.ElementAt(0) == CustomLengthDelimiterPrefix;
+            if (customDelimiterIsDefined)
+                numberList = BuildNumberListForCustomDelimiter(input);
+            else
+                numberList = ConvertStringToNumberList(input).ToList();
 
-                        if (customLengthDelimiterIsDefined)
-                        {
-                            var bracketDelimiters = new[] { CustomLengthDelimiterPrefix, CustomLengthDelimiterSuffix };
-                            var multipleCustomDelimiters = customDelimiter.Split(bracketDelimiters, StringSplitOptions.RemoveEmptyEntries);
-                            input = expressionParts[1];
-                            numberList = ConvertStringToNumberList(input, multipleCustomDelimiters).ToList();
-                        }
-                        else
-                        {
-                            input = expressionParts[1];
-                            numberList = ConvertStringToNumberList(input, customDelimiter).ToList();
-                        }
-                    }
-                    else
-                    {
-                        numberList = ConvertStringToNumberList(input, customDelimiter).ToList();
-                    }
-                    
-                    sum = SumOfList(numberList);
-                }
-            }
-            
-            return firstNumber + sum;
+            VerifyNoNegativesExist(numberList);
+
+            return numberList.Where(n => n <= maxNumber).Sum();
         }
 
-        private IEnumerable<Int32> ConvertStringToNumberList(String input, String customDelimiter)
+        private List<Int32> BuildNumberListForCustomDelimiter(String input)
         {
-            var delimiters = new[] { ",", "\n", null };
-            if (customDelimiter != null)
-                delimiters[2] = customDelimiter;
-            
-            var stringParts = input.Split(delimiters, StringSplitOptions.None);
+            var isolatingDelimiters = new[] { CustomDelimiterPrefix, CustomDelimiterSuffix };
+            var expressionParts = input.Split(isolatingDelimiters, StringSplitOptions.RemoveEmptyEntries);
+            var customDelimiter = expressionParts[0];
+            var customLengthDelimiterIsDefined = customDelimiter.ElementAt(0) == CustomLengthDelimiterPrefix;
+            var stringEquation = expressionParts[1];
 
-            return StringsToIntegers(stringParts);
+            if (customLengthDelimiterIsDefined)
+                return BuildNumberListForCustomLengthDelimiter(customDelimiter, stringEquation);
+            else
+                return ConvertStringToNumberList(stringEquation, customDelimiter).ToList();
+        }
+
+        private List<Int32> BuildNumberListForCustomLengthDelimiter(String customDelimiter, String input)
+        {
+            var bracketDelimiters = new[] { CustomLengthDelimiterPrefix, CustomLengthDelimiterSuffix };
+            var multipleCustomDelimiters = customDelimiter.Split(bracketDelimiters, StringSplitOptions.RemoveEmptyEntries);
+
+            return ConvertStringToNumberList(input, multipleCustomDelimiters).ToList();
+        }
+
+        private IEnumerable<Int32> ConvertStringToNumberList(String input, String customDelimiter = null)
+        {
+            return ConvertStringToNumberList(input, new[] { customDelimiter });
         }
 
         private IEnumerable<Int32> ConvertStringToNumberList(String input, String[] customDelimiters)
@@ -81,35 +71,23 @@ namespace StringCalculatorKata
             return StringsToIntegers(stringParts);
         }
 
-        private Int32 SumOfList(List<Int32> list)
+        private void VerifyNoNegativesExist(List<Int32> numberList)
         {
-            const Int32 minNumber = 0;
-            const Int32 maxNumber = 1000;
-            var negatives = list.Where(n => n < minNumber);
-            var sum = list.Where(n => n <= maxNumber).Sum();
+            var negatives = numberList.Where(n => n < minNumber);
 
             if (negatives.Any())
             {
                 var exceptionMessage = BuildNegativeNumberExceptionMessage(negatives);
                 throw new NegativesNotAllowedException(exceptionMessage);
             }
-
-            return sum;
         }
 
-        private IEnumerable<Int32> StringsToIntegers(string[] array)
+        private IEnumerable<Int32> StringsToIntegers(String[] array)
         {
             return array.Select(s => Convert.ToInt32(s));
-            //var returnList = new List<Int32>();
-
-
-            //foreach(var str in array)
-            //    returnList.Add(Convert.ToInt32(str));
-
-            //return returnList;
         }
 
-        private static string BuildNegativeNumberExceptionMessage(IEnumerable<int> negatives)
+        private String BuildNegativeNumberExceptionMessage(IEnumerable<Int32> negatives)
         {
             var negativeNumbers = String.Join(", ", negatives);
             var notAllowedMessage = negatives.Count() > 1 ? "are not allowed." : "is not allowed.";
