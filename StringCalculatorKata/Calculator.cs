@@ -41,17 +41,17 @@ namespace StringCalculatorKata
                             var bracketDelimiters = new[] { CustomLengthDelimiterPrefix, CustomLengthDelimiterSuffix };
                             var multipleCustomDelimiters = customDelimiter.Split(bracketDelimiters, StringSplitOptions.RemoveEmptyEntries);
                             input = expressionParts[1];
-                            numberList = ConvertStringToNumberList(input, multipleCustomDelimiters);
+                            numberList = ConvertStringToNumberList(input, multipleCustomDelimiters).ToList();
                         }
                         else
                         {
                             input = expressionParts[1];
-                            numberList = ConvertStringToNumberList(input, customDelimiter);
+                            numberList = ConvertStringToNumberList(input, customDelimiter).ToList();
                         }
                     }
                     else
                     {
-                        numberList = ConvertStringToNumberList(input, customDelimiter);
+                        numberList = ConvertStringToNumberList(input, customDelimiter).ToList();
                     }
                     
                     sum = SumOfList(numberList);
@@ -61,7 +61,7 @@ namespace StringCalculatorKata
             return firstNumber + sum;
         }
 
-        private List<Int32> ConvertStringToNumberList(String input, String customDelimiter)
+        private IEnumerable<Int32> ConvertStringToNumberList(String input, String customDelimiter)
         {
             var delimiters = new[] { ",", "\n", null };
             if (customDelimiter != null)
@@ -72,12 +72,10 @@ namespace StringCalculatorKata
             return StringsToIntegers(stringParts);
         }
 
-        private List<Int32> ConvertStringToNumberList(String input, String[] customDelimiters)
+        private IEnumerable<Int32> ConvertStringToNumberList(String input, String[] customDelimiters)
         {
             var delimiters = new List<String> { ",", "\n"};
-
             delimiters.AddRange(customDelimiters);
-
             var stringParts = input.Split(delimiters.ToArray(), StringSplitOptions.None);
 
             return StringsToIntegers(stringParts);
@@ -85,16 +83,11 @@ namespace StringCalculatorKata
 
         private Int32 SumOfList(List<Int32> list)
         {
-            var sum = 0;
-            var negatives = new List<Int32>();
+            const Int32 minNumber = 0;
+            const Int32 maxNumber = 1000;
+            var negatives = list.Where(n => n < minNumber);
+            var sum = list.Where(n => n <= maxNumber).Sum();
 
-            foreach (var number in list)
-            {
-                if(number < 0)
-                    negatives.Add(number);
-                if(number <= 1000)
-                    sum += number;
-            }
             if (negatives.Any())
             {
                 var exceptionMessage = BuildNegativeNumberExceptionMessage(negatives);
@@ -104,16 +97,19 @@ namespace StringCalculatorKata
             return sum;
         }
 
-        private List<Int32> StringsToIntegers(string[] array)
+        private IEnumerable<Int32> StringsToIntegers(string[] array)
         {
-            var returnList = new List<Int32>();
-            foreach(var str in array)
-                returnList.Add(Convert.ToInt32(str));
+            return array.Select(s => Convert.ToInt32(s));
+            //var returnList = new List<Int32>();
 
-            return returnList;
+
+            //foreach(var str in array)
+            //    returnList.Add(Convert.ToInt32(str));
+
+            //return returnList;
         }
 
-        private static string BuildNegativeNumberExceptionMessage(List<int> negatives)
+        private static string BuildNegativeNumberExceptionMessage(IEnumerable<int> negatives)
         {
             var negativeNumbers = String.Join(", ", negatives);
             var notAllowedMessage = negatives.Count() > 1 ? "are not allowed." : "is not allowed.";
