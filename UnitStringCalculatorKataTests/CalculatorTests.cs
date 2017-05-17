@@ -54,5 +54,23 @@ namespace UnitStringCalculatorKataTests
         {
             Assert.AreEqual(9, calculator.Add("3,3,3"));
         }
+
+        [TestMethod]
+        public void FourFoursReturnsSixteen()
+        {
+            Assert.AreEqual(16, calculator.Add("4,4,4,4"));
+        }
+
+        [TestMethod]
+        public void NewLinesAndCommasCanBeDelimiters()
+        {
+            Assert.AreEqual(6, calculator.Add("1\n2,3"));
+        }
+
+        [TestMethod]
+        public void OnlyNewLinesAsDelimiters()
+        {
+            Assert.AreEqual(6, calculator.Add("1\n2\n3"));
+        }
     }
 }

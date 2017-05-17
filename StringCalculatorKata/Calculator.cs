@@ -1,8 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace StringCalculatorKata
 {
@@ -15,7 +12,7 @@ namespace StringCalculatorKata
 
             if (!String.IsNullOrWhiteSpace(input))
             {
-                if(!input.Contains(","))
+                if(!(input.Contains(",") || input.Contains("\n")))
                 {
                     firstNumber = Convert.ToInt32(input);
                 }
@@ -31,19 +28,11 @@ namespace StringCalculatorKata
 
         private List<Int32> ConvertStringToNumberList(String input)
         {
-            var numberList = new List<Int32>();
-            var commaIndex = input.IndexOf(',');
+            
+            var delimiters = new[] {',', '\n' };
+            var stringParts = input.Split(delimiters, StringSplitOptions.None);
 
-            while (commaIndex != -1)
-            {
-                numberList.Add(Convert.ToInt32(input.Substring(0, commaIndex)));
-                input = input.Substring(commaIndex + 1, input.Length - commaIndex - 1);
-                commaIndex = input.IndexOf(',');
-            }
-
-            numberList.Add(Convert.ToInt32(input.Substring(0, input.Length)));
-
-            return numberList;
+            return StringsToIntegers(stringParts);
         }
 
         private Int32 SumOfList(List<Int32> list)
@@ -53,6 +42,15 @@ namespace StringCalculatorKata
                 sum += number;
 
             return sum;
+        }
+
+        private List<Int32> StringsToIntegers(string[] array)
+        {
+            var returnList = new List<Int32>();
+            foreach(var str in array)
+                returnList.Add(Convert.ToInt32(str));
+
+            return returnList;
         }
     }
 }
