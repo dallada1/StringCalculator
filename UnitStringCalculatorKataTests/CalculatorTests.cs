@@ -48,5 +48,11 @@ namespace UnitStringCalculatorKataTests
         {
             Assert.AreEqual(22, calculator.Add("11,11"));
         }
+
+        [TestMethod]
+        public void ThreeThreesReturnsNine()
+        {
+            Assert.AreEqual(9, calculator.Add("3,3,3"));
+        }
     }
 }
