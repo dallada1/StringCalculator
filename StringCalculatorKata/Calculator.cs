@@ -8,6 +8,8 @@ namespace StringCalculatorKata
     {
         private const String CustomDelimiterPrefix = "//";
         private const String CustomDelimiterSuffix = "\n";
+        private const Char CustomLengthDelimiterPrefix = '[';
+        private const Char CustomLengthDelimiterSuffix = ']';
 
         public Int32 Add(String input)
         {
@@ -24,12 +26,21 @@ namespace StringCalculatorKata
                 {
                     String customDelimiter = null;
                     var customDelimiterIsDefined = input.Substring(0, 2) == CustomDelimiterPrefix;
-
+                    
                     if (customDelimiterIsDefined)
                     {
+
                         var isolatingDelimiters = new[] { CustomDelimiterPrefix, CustomDelimiterSuffix };
                         var expressionParts = input.Split(isolatingDelimiters, StringSplitOptions.RemoveEmptyEntries);
                         customDelimiter = expressionParts[0];
+                        var customLengthDelimiterIsDefined = customDelimiter.ElementAt(0) == CustomLengthDelimiterPrefix;
+
+                        if (customLengthDelimiterIsDefined)
+                        {
+                            var bracketDelimiters = new[] { CustomLengthDelimiterPrefix, CustomLengthDelimiterSuffix };
+                            customDelimiter = customDelimiter.Split(bracketDelimiters, StringSplitOptions.RemoveEmptyEntries)[0];
+                        }
+
                         input = expressionParts[1];
                     }
 
@@ -61,8 +72,8 @@ namespace StringCalculatorKata
             {
                 if(number < 0)
                     negatives.Add(number);
-                
-                sum += number;
+                if(number <= 1000)
+                    sum += number;
             }
             if (negatives.Any())
             {

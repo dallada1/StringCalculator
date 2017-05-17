@@ -92,5 +92,17 @@ namespace UnitStringCalculatorKataTests
             var exception = Assert.ThrowsException<NegativesNotAllowedException>(() => calculator.Add("-1,-3"));
             Assert.AreEqual("-1, -3 are not allowed.", exception.Message);
         }
+
+        [TestMethod]
+        public void NumbersLargerThan1000AreIgnored()
+        {
+            Assert.AreEqual(2, calculator.Add("2,1001"));
+        }
+
+        [TestMethod]
+        public void DelimiterCanBeAnyLength()
+        {
+            Assert.AreEqual(6, calculator.Add("//[***]\n1***2***3"));
+        }
     }
 }
