@@ -25,8 +25,9 @@ namespace StringCalculatorKata
                 else
                 {
                     String customDelimiter = null;
+                    var numberList = new List<Int32>();
                     var customDelimiterIsDefined = input.Substring(0, 2) == CustomDelimiterPrefix;
-                    
+
                     if (customDelimiterIsDefined)
                     {
 
@@ -38,13 +39,21 @@ namespace StringCalculatorKata
                         if (customLengthDelimiterIsDefined)
                         {
                             var bracketDelimiters = new[] { CustomLengthDelimiterPrefix, CustomLengthDelimiterSuffix };
-                            customDelimiter = customDelimiter.Split(bracketDelimiters, StringSplitOptions.RemoveEmptyEntries)[0];
+                            var multipleCustomDelimiters = customDelimiter.Split(bracketDelimiters, StringSplitOptions.RemoveEmptyEntries);
+                            input = expressionParts[1];
+                            numberList = ConvertStringToNumberList(input, multipleCustomDelimiters);
                         }
-
-                        input = expressionParts[1];
+                        else
+                        {
+                            input = expressionParts[1];
+                            numberList = ConvertStringToNumberList(input, customDelimiter);
+                        }
                     }
-
-                    var numberList = ConvertStringToNumberList(input, customDelimiter);
+                    else
+                    {
+                        numberList = ConvertStringToNumberList(input, customDelimiter);
+                    }
+                    
                     sum = SumOfList(numberList);
                 }
             }
@@ -59,6 +68,17 @@ namespace StringCalculatorKata
                 delimiters[2] = customDelimiter;
             
             var stringParts = input.Split(delimiters, StringSplitOptions.None);
+
+            return StringsToIntegers(stringParts);
+        }
+
+        private List<Int32> ConvertStringToNumberList(String input, String[] customDelimiters)
+        {
+            var delimiters = new List<String> { ",", "\n"};
+
+            delimiters.AddRange(customDelimiters);
+
+            var stringParts = input.Split(delimiters.ToArray(), StringSplitOptions.None);
 
             return StringsToIntegers(stringParts);
         }

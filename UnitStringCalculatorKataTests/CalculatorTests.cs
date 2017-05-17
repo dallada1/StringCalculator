@@ -104,5 +104,17 @@ namespace UnitStringCalculatorKataTests
         {
             Assert.AreEqual(6, calculator.Add("//[***]\n1***2***3"));
         }
+
+        [TestMethod]
+        public void MultipleDelimitersCanBeSet()
+        {
+            Assert.AreEqual(6, calculator.Add("//[*][%]\n1*2%3"));
+        }
+
+        [TestMethod]
+        public void MultipleDelimitersCanBeSetLongerThanOneCharacter()
+        {
+            Assert.AreEqual(6, calculator.Add("//[***][%%%]\n1***2%%%3"));
+        }
     }
 }
