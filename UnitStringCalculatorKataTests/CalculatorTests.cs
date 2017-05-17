@@ -78,5 +78,19 @@ namespace UnitStringCalculatorKataTests
         {
             Assert.AreEqual(3, calculator.Add("//;\n1;2"));
         }
+
+        [TestMethod]
+        public void NegativeNumberThrowsExceptionWithNumberInMessage()
+        {
+            var exception = Assert.ThrowsException<NegativesNotAllowedException>(() => calculator.Add("2,-3"));
+            Assert.AreEqual("-3 is not allowed.", exception.Message);
+        }
+
+        [TestMethod]
+        public void MultipleNegativeNumbersThrowExceptionWithNumbersInMessage()
+        {
+            var exception = Assert.ThrowsException<NegativesNotAllowedException>(() => calculator.Add("-1,-3"));
+            Assert.AreEqual("-1, -3 are not allowed.", exception.Message);
+        }
     }
 }

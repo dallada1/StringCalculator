@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace StringCalculatorKata
 {
@@ -54,8 +55,20 @@ namespace StringCalculatorKata
         private Int32 SumOfList(List<Int32> list)
         {
             var sum = 0;
+            var negatives = new List<Int32>();
+
             foreach (var number in list)
+            {
+                if(number < 0)
+                    negatives.Add(number);
+                
                 sum += number;
+            }
+            if (negatives.Any())
+            {
+                var exceptionMessage = BuildNegativeNumberExceptionMessage(negatives);
+                throw new NegativesNotAllowedException(exceptionMessage);
+            }
 
             return sum;
         }
@@ -67,6 +80,15 @@ namespace StringCalculatorKata
                 returnList.Add(Convert.ToInt32(str));
 
             return returnList;
+        }
+
+        private static string BuildNegativeNumberExceptionMessage(List<int> negatives)
+        {
+            var negativeNumbers = String.Join(", ", negatives);
+            var notAllowedMessage = negatives.Count() > 1 ? "are not allowed." : "is not allowed.";
+            var exceptionMessage = String.Format("{0} {1}", negativeNumbers, notAllowedMessage);
+
+            return exceptionMessage;
         }
     }
 }
