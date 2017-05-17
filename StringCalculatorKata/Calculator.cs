@@ -5,6 +5,9 @@ namespace StringCalculatorKata
 {
     public class Calculator
     {
+        private const String CustomDelimiterPrefix = "//";
+        private const String CustomDelimiterSuffix = "\n";
+
         public Int32 Add(String input)
         {
             var firstNumber = 0;
@@ -18,7 +21,18 @@ namespace StringCalculatorKata
                 }
                 else
                 {
-                    var numberList = ConvertStringToNumberList(input);
+                    String customDelimiter = null;
+                    var customDelimiterIsDefined = input.Substring(0, 2) == CustomDelimiterPrefix;
+
+                    if (customDelimiterIsDefined)
+                    {
+                        var isolatingDelimiters = new[] { CustomDelimiterPrefix, CustomDelimiterSuffix };
+                        var expressionParts = input.Split(isolatingDelimiters, StringSplitOptions.RemoveEmptyEntries);
+                        customDelimiter = expressionParts[0];
+                        input = expressionParts[1];
+                    }
+
+                    var numberList = ConvertStringToNumberList(input, customDelimiter);
                     sum = SumOfList(numberList);
                 }
             }
@@ -26,10 +40,12 @@ namespace StringCalculatorKata
             return firstNumber + sum;
         }
 
-        private List<Int32> ConvertStringToNumberList(String input)
+        private List<Int32> ConvertStringToNumberList(String input, String customDelimiter)
         {
+            var delimiters = new[] { ",", "\n", null };
+            if (customDelimiter != null)
+                delimiters[2] = customDelimiter;
             
-            var delimiters = new[] {',', '\n' };
             var stringParts = input.Split(delimiters, StringSplitOptions.None);
 
             return StringsToIntegers(stringParts);

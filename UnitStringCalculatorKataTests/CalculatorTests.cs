@@ -72,5 +72,11 @@ namespace UnitStringCalculatorKataTests
         {
             Assert.AreEqual(6, calculator.Add("1\n2\n3"));
         }
+
+        [TestMethod]
+        public void ConfiguringDelimitersWorks()
+        {
+            Assert.AreEqual(3, calculator.Add("//;\n1;2"));
+        }
     }
 }
